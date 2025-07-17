@@ -60,7 +60,7 @@ async def handle_message(message: types.Message):
             reply = await bot.send_message(chat_id, warning_text, reply_markup=SUBSCRIBE_BUTTON)
 
             # Видаляємо це повідомлення через 5 секунд
-            await asyncio.sleep(5)
+            await asyncio.sleep(10)
             await reply.delete()
 
         except ChatAdminRequired:
