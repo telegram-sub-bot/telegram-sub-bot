@@ -23,7 +23,7 @@ WARNING_TEXT = (
 
 # Кнопка підписки
 SUBSCRIBE_BUTTON = InlineKeyboardMarkup().add(
-    InlineKeyboardButton("📲 Підписатися", url="https://t.me/+IsSgAN3CDshmM2IyID")
+    InlineKeyboardButton("📲 Підписатися", url="https://t.me/+326rbR1CM8QwMThi")
 )
 
 # Права після підписки (дозволяє писати)
