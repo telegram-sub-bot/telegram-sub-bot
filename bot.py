@@ -1,7 +1,7 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import ChatPermissions, InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.exceptions import ChatAdminRequired, CantRestrictSelf
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.exceptions import ChatAdminRequired
 
 import logging
 import os
@@ -15,41 +15,14 @@ CHANNEL_ID = -1002317263713
 # ID двух групп, где работает бот
 ALLOWED_GROUPS = [-1001363070158, -1001995633215]
 
-# Текст уведомления
-WARNING_TEXT = (
-    "🔒 Щоб писати в групі, потрібно бути підписаним на канал.\n"
-    "👇 Натисни кнопку нижче для підписки:"
-)
-
 # Кнопка підписки
 SUBSCRIBE_BUTTON = InlineKeyboardMarkup().add(
     InlineKeyboardButton("📲 Підписатися", url="https://t.me/+326rbR1CM8QwMThi")
 )
 
-# Права після підписки (дозволяє писати)
-PERMISSIONS_FULL = ChatPermissions(
-    can_send_messages=True,
-    can_send_media_messages=True,
-    can_send_polls=True,
-    can_send_other_messages=True,
-    can_add_web_page_previews=True,
-    can_invite_users=True,
-)
-
-# Права до підписки (забороняє писати)
-PERMISSIONS_RESTRICTED = ChatPermissions(
-    can_send_messages=False,
-    can_send_media_messages=False,
-    can_send_polls=False,
-    can_send_other_messages=False,
-    can_add_web_page_previews=False,
-    can_invite_users=False,
-)
-
 # Ініціалізація бота
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
-
 
 async def is_subscribed(user_id: int) -> bool:
     try:
@@ -58,9 +31,8 @@ async def is_subscribed(user_id: int) -> bool:
     except:
         return False
 
-
 @dp.message_handler(lambda message: message.chat.id in ALLOWED_GROUPS)
-async def restrict_if_not_subscribed(message: types.Message):
+async def handle_message(message: types.Message):
     user_id = message.from_user.id
     chat_id = message.chat.id
 
@@ -72,35 +44,27 @@ async def restrict_if_not_subscribed(message: types.Message):
     except:
         return
 
-    # Перевіряємо підписку
     if not await is_subscribed(user_id):
         try:
-            # Обмежуємо користувача
-            await bot.restrict_chat_member(
-                chat_id=chat_id,
-                user_id=user_id,
-                permissions=PERMISSIONS_RESTRICTED
-            )
-
-            # Видаляємо його повідомлення
+            # Видаляємо повідомлення користувача
             await message.delete()
 
-            # Відповідаємо в групі з кнопкою підписки
-            await bot.send_message(chat_id, WARNING_TEXT, reply_markup=SUBSCRIBE_BUTTON)
-
-        except (ChatAdminRequired, CantRestrictSelf):
-            pass
-    else:
-        # Якщо підписаний — знімаємо обмеження
-        try:
-            await bot.restrict_chat_member(
-                chat_id=chat_id,
-                user_id=user_id,
-                permissions=PERMISSIONS_FULL
+            # Текст повідомлення з ім'ям користувача
+            name = message.from_user.first_name or "користувач"
+            warning_text = (
+                f"🔒 {name}, щоб писати в групі, потрібно бути підписаним на канал.\n"
+                f"👇 Натисни кнопку нижче для підписки:"
             )
-        except:
-            pass
 
+            # Надсилаємо повідомлення
+            reply = await bot.send_message(chat_id, warning_text, reply_markup=SUBSCRIBE_BUTTON)
+
+            # Видаляємо це повідомлення через 5 секунд
+            await asyncio.sleep(5)
+            await reply.delete()
+
+        except ChatAdminRequired:
+            pass
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
