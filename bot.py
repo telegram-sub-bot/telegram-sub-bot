@@ -60,10 +60,18 @@ async def handle_message(message: types.Message):
                 f"👇 Натисни кнопку нижче для підписки:"
             )
 
-            # Отправляем предупреждение
-            reply = await bot.send_message(chat_id, warning_text, reply_markup=SUBSCRIBE_BUTTON)
+            # Ссылка на изображение
+            image_url = "https://i.postimg.cc/66kjh8c4/Polish-20250718-115606708.jpg"
 
-            # Удаляем предупреждение через 20 секунд
+            # Отправляем фото с подписью и кнопкой
+            reply = await bot.send_photo(
+                chat_id,
+                photo=image_url,
+                caption=warning_text,
+                reply_markup=SUBSCRIBE_BUTTON
+            )
+
+            # Удаляем сообщение через 20 секунд
             await asyncio.sleep(20)
             await reply.delete()
 
