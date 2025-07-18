@@ -49,17 +49,22 @@ async def handle_message(message: types.Message):
             # Видаляємо повідомлення користувача
             await message.delete()
 
-            # Текст повідомлення з ім'ям користувача
+            # Підпис з ім’ям
             name = message.from_user.first_name or "користувач"
-            warning_text = (
+            caption = (
                 f"🔒 {name}, щоб писати в групі, потрібно бути підписаним на канал.\n"
                 f"👇 Натисни кнопку нижче для підписки:"
             )
 
-            # Надсилаємо повідомлення
-            reply = await bot.send_message(chat_id, warning_text, reply_markup=SUBSCRIBE_BUTTON)
+            # Надсилаємо зображення з підписом та кнопкою
+            reply = await bot.send_photo(
+                chat_id=chat_id,
+                photo="https://i.postimg.cc/66kjh8c4/Polish-20250718-115606708.jpg",
+                caption=caption,
+                reply_markup=SUBSCRIBE_BUTTON
+            )
 
-            # Видаляємо це повідомлення через 5 секунд
+            # Видаляємо це повідомлення через 10 секунд
             await asyncio.sleep(10)
             await reply.delete()
 
