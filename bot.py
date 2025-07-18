@@ -65,7 +65,7 @@ async def handle_message(message: types.Message):
             )
 
             # Видаляємо це повідомлення через 10 секунд
-            await asyncio.sleep(10)
+            await asyncio.sleep(20)
             await reply.delete()
 
         except ChatAdminRequired:
